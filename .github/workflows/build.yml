@@ -1,19 +1,25 @@
-name: Build Clean APK with Icon 
+name: Build NEXURA Browser APK
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
-  build:
+  build-apk:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Java JDK
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Java JDK Environment
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
@@ -22,46 +28,57 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      - name: Build Cordova APK
+      - name: Initialize Project Directory & Dependencies
         run: |
-          npm install -g cordova
-          
-          # 1. Create Cordova project
-          cordova create app com.tiny.velora "TINY FISHING"
-          
-          # 2. Copy Web Source Assets
-          cp *.html app/www/ 2>/dev/null || true
-          cp *.js app/www/ 2>/dev/null || true
-          cp *.css app/www/ 2>/dev/null || true
-          cp *.png app/www/ 2>/dev/null || true
-          
-          # 3. Add Custom Icon if present
+          mkdir -p www
+          cp index.html www/
+          npm init -y
+          npm install @capacitor/core @capacitor/cli @capacitor/android sharp-cli
+
+      - name: Initialize Capacitor Platform
+        run: |
+          npx cap init "NEXURA BROWSER" "com.nexura.browser" --web-dir www
+          npx cap add android
+
+      - name: Generate and Inject Custom App Icons from icon.png
+        run: |
           if [ -f "icon.png" ]; then
-            cp icon.png app/www/icon.png
-            sed -i '/<\/widget>/i \    <icon src="www/icon.png" \/>' app/config.xml
+            echo "Processing custom icon.png..."
+            RES_DIR="android/app/src/main/res"
+            
+            # Create icon sizes for different Android densities using sharp-cli or convert
+            npx sharp-cli -i icon.png -o $RES_DIR/mipmap-mdpi/ic_launcher.png resize 48 48 --fit cover || true
+            npx sharp-cli -i icon.png -o $RES_DIR/mipmap-hdpi/ic_launcher.png resize 72 72 --fit cover || true
+            npx sharp-cli -i icon.png -o $RES_DIR/mipmap-xhdpi/ic_launcher.png resize 96 96 --fit cover || true
+            npx sharp-cli -i icon.png -o $RES_DIR/mipmap-xxhdpi/ic_launcher.png resize 144 144 --fit cover || true
+            npx sharp-cli -i icon.png -o $RES_DIR/mipmap-xxxhdpi/ic_launcher.png resize 192 192 --fit cover || true
+
+            # Round icons setup as well
+            npx sharp-cli -i icon.png -o $RES_DIR/mipmap-mdpi/ic_launcher_round.png resize 48 48 --fit cover || true
+            npx sharp-cli -i icon.png -o $RES_DIR/mipmap-hdpi/ic_launcher_round.png resize 72 72 --fit cover || true
+            npx swift-cli -i icon.png -o $RES_DIR/mipmap-xhdpi/ic_launcher_round.png resize 96 96 --fit cover || true
+            npx sharp-cli -i icon.png -o $RES_DIR/mipmap-xxhdpi/ic_launcher_round.png resize 144 144 --fit cover || true
+            npx sharp-cli -i icon.png -o $RES_DIR/mipmap-xxxhdpi/ic_launcher_round.png resize 192 192 --fit cover || true
+          else
+            echo "icon.png not found, skipping custom icon injection."
           fi
-          
-          # 4. Set Landscape Orientation in config.xml
-          sed -i '/<\/widget>/i \    <preference name="Orientation" value="landscape" \/>' app/config.xml
 
-          # 5. Add Android Platform & Build
-          cd app
-          cordova platform add android
-          
-          # Fix Gradle executable permissions
-          if [ -d "platforms/android" ]; then
-            chmod +x platforms/android/gradlew || true
-          fi
+      - name: Configure Android Permissions & Options
+        run: |
+          sed -i 's/android:usesCleartextTraffic="false"/android:usesCleartextTraffic="true"/g' android/app/src/main/AndroidManifest.xml || true
 
-          cordova build android --debug
+      - name: Sync Capacitor Web Assets
+        run: |
+          npx cap sync android
 
-      - name: Upload APK
+      - name: Build Debug APK via Gradle
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload APK Release Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Stickman-Shooter-GAME
-          path: app/platforms/android/app/build/outputs/apk/debug/app-debug.apk
+          name: NEXURA-Browser-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
