@@ -1,0 +1,12 @@
+android {
+    ...
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+// Ye licenses auto-accept karne ke liye hai
+tasks.withType(com.android.build.gradle.tasks.factory.AndroidUnitTest) {
+    it.dependsOn 'installAndroidSdkLicenses'
+}
