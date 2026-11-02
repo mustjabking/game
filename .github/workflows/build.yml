@@ -28,6 +28,10 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Accept Android SDK Licenses Automatically
+        run: |
+          yes | sdkmanager --licenses || true
+
       - name: Initialize Project Directory & Dependencies
         run: |
           mkdir -p www
@@ -46,24 +50,22 @@ jobs:
             echo "Processing custom icon.png..."
             RES_DIR="android/app/src/main/res"
             
-            # Create icon sizes for different Android densities using sharp-cli or convert
             npx sharp-cli -i icon.png -o $RES_DIR/mipmap-mdpi/ic_launcher.png resize 48 48 --fit cover || true
             npx sharp-cli -i icon.png -o $RES_DIR/mipmap-hdpi/ic_launcher.png resize 72 72 --fit cover || true
             npx sharp-cli -i icon.png -o $RES_DIR/mipmap-xhdpi/ic_launcher.png resize 96 96 --fit cover || true
             npx sharp-cli -i icon.png -o $RES_DIR/mipmap-xxhdpi/ic_launcher.png resize 144 144 --fit cover || true
             npx sharp-cli -i icon.png -o $RES_DIR/mipmap-xxxhdpi/ic_launcher.png resize 192 192 --fit cover || true
 
-            # Round icons setup as well
             npx sharp-cli -i icon.png -o $RES_DIR/mipmap-mdpi/ic_launcher_round.png resize 48 48 --fit cover || true
             npx sharp-cli -i icon.png -o $RES_DIR/mipmap-hdpi/ic_launcher_round.png resize 72 72 --fit cover || true
-            npx swift-cli -i icon.png -o $RES_DIR/mipmap-xhdpi/ic_launcher_round.png resize 96 96 --fit cover || true
+            npx sharp-cli -i icon.png -o $RES_DIR/mipmap-xhdpi/ic_launcher_round.png resize 96 96 --fit cover || true
             npx sharp-cli -i icon.png -o $RES_DIR/mipmap-xxhdpi/ic_launcher_round.png resize 144 144 --fit cover || true
             npx sharp-cli -i icon.png -o $RES_DIR/mipmap-xxxhdpi/ic_launcher_round.png resize 192 192 --fit cover || true
           else
-            echo "icon.png not found, skipping custom icon injection."
+            echo "icon.png not found, skipping."
           fi
 
-      - name: Configure Android Permissions & Options
+      - name: Configure Android Cleartext Traffic
         run: |
           sed -i 's/android:usesCleartextTraffic="false"/android:usesCleartextTraffic="true"/g' android/app/src/main/AndroidManifest.xml || true
 
