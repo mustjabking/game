@@ -1,233 +1,349 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TINNY FISHING</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>NEXURA BROWSER</title>
+  <style>
+    :root {
+      --bg-dark: #0a0d14;
+      --panel-bg: rgba(18, 24, 38, 0.75);
+      --accent-cyan: #00f2fe;
+      --accent-blue: #4facfe;
+      --accent-purple: #7f00ff;
+      --text-main: #f0f4f8;
+      --text-dim: #8a99ad;
+      --border-glow: rgba(0, 242, 254, 0.25);
+    }
 
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { height: 100%; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-  body {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: radial-gradient(circle at 50% 0%, #004a73 0%, #002b45 45%, #00121f 100%);
-    font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
-    overflow: hidden;
-    position: relative;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-  }
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
 
-  /* ---------- Bubbles ---------- */
-  #bubbles {
-    position: fixed;
-    inset: 0;
-    overflow: hidden;
-    pointer-events: none;
-    z-index: 1;
-  }
-  #bubbles span {
-    position: absolute;
-    bottom: -80px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%,
-                rgba(255,255,255,.85),
-                rgba(120,230,255,.25) 45%,
-                rgba(255,255,255,.03) 72%);
-    border: 1px solid rgba(255,255,255,.18);
-    animation: rise linear infinite;
-  }
-  @keyframes rise {
-    0%   { transform: translateY(0) translateX(0) scale(.8); opacity: 0; }
-    12%  { opacity: .85; }
-    88%  { opacity: .85; }
-    100% { transform: translateY(-115vh) translateX(50px) scale(1.15); opacity: 0; }
-  }
+    /* Top Navigation Bar */
+    header {
+      background: var(--panel-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-glow);
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 100;
+    }
 
-  /* ---------- Card ---------- */
-  .card {
-    position: relative;
-    z-index: 10;
-    text-align: center;
-    padding: 30px 24px;
-    animation: cardIn .9s cubic-bezier(.2,.8,.3,1) both;
-  }
-  @keyframes cardIn {
-    from { opacity: 0; transform: translateY(35px) scale(.92); }
-    to   { opacity: 1; transform: translateY(0) scale(1); }
-  }
+    .brand-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-  /* ---------- Circle Icon ---------- */
-  .logo-wrap {
-    position: relative;
-    width: 170px;
-    height: 170px;
-    margin: 0 auto 28px;
-    border-radius: 50%;
-    overflow: hidden;
-    background: #012b45;
-    border: 5px solid rgba(255,255,255,.9);
-    box-shadow:
-      0 0 0 9px rgba(0, 220, 255, .14),
-      0 0 45px rgba(0, 210, 255, .75),
-      0 0 90px rgba(0, 150, 255, .35);
-    animation: floaty 3.2s ease-in-out infinite,
-               glowPulse 2.6s ease-in-out infinite alternate;
-  }
-  .logo-wrap .fish-fallback {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 70px;
-    z-index: 0;
-  }
-  .logo-wrap img {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 50%;
-    display: block;
-  }
-  @keyframes floaty {
-    0%, 100% { transform: translateY(0); }
-    50%      { transform: translateY(-14px); }
-  }
-  @keyframes glowPulse {
-    from { box-shadow: 0 0 0 9px rgba(0,220,255,.10), 0 0 35px rgba(0,210,255,.55), 0 0 70px rgba(0,150,255,.25); }
-    to   { box-shadow: 0 0 0 12px rgba(0,220,255,.20), 0 0 60px rgba(0,230,255,.95), 0 0 110px rgba(0,150,255,.5); }
-  }
+    .brand-title {
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-transform: uppercase;
+    }
 
-  /* ---------- Title ---------- */
-  .title {
-    font-size: clamp(2.1rem, 9vw, 3.6rem);
-    font-weight: 800;
-    letter-spacing: 6px;
-    line-height: 1.1;
-    background: linear-gradient(180deg, #ffffff 0%, #9bf3ff 55%, #00c2ff 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    filter: drop-shadow(0 0 22px rgba(0, 200, 255, .65));
-  }
+    .brand-author {
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
 
-  .credit {
-    margin-top: 12px;
-    font-size: clamp(.72rem, 3vw, .9rem);
-    font-weight: 600;
-    letter-spacing: 4px;
-    color: #8fd8f2;
-    text-transform: uppercase;
-    opacity: .9;
-  }
-  .credit b {
-    color: #ffffff;
-    font-weight: 800;
-    letter-spacing: 3px;
-  }
+    .search-box {
+      display: flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 4px 8px 4px 14px;
+      transition: all 0.3s ease;
+    }
 
-  /* ---------- Play Button ---------- */
-  .play-btn {
-    margin-top: 42px;
-    padding: 18px 64px;
-    font-family: inherit;
-    font-size: clamp(1.1rem, 4.5vw, 1.45rem);
-    font-weight: 800;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: #00303f;
-    border: none;
-    border-radius: 60px;
-    cursor: pointer;
-    background: linear-gradient(180deg, #b6fff2 0%, #2df0d2 45%, #00bfa6 100%);
-    box-shadow:
-      0 9px 0 #00796b,
-      0 14px 35px rgba(0, 235, 200, .45);
-    transition: transform .12s ease, box-shadow .12s ease, filter .2s ease;
-    animation: btnPulse 2.2s ease-in-out infinite;
-  }
-  @keyframes btnPulse {
-    0%, 100% { box-shadow: 0 9px 0 #00796b, 0 14px 35px rgba(0,235,200,.40); }
-    50%      { box-shadow: 0 9px 0 #00796b, 0 14px 55px rgba(0,255,215,.80); }
-  }
-  .play-btn:hover {
-    transform: translateY(-3px);
-    filter: brightness(1.08);
-    box-shadow: 0 12px 0 #00796b, 0 20px 45px rgba(0,255,215,.65);
-  }
-  .play-btn:active {
-    transform: translateY(6px);
-    box-shadow: 0 3px 0 #00796b, 0 8px 18px rgba(0,255,215,.40);
-    animation: none;
-  }
+    .search-box:focus-within {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 12px var(--border-glow);
+      background: rgba(255, 255, 255, 0.08);
+    }
 
-  /* ---------- Bottom wave glow ---------- */
-  .wave-glow {
-    position: fixed;
-    left: 0; right: 0; bottom: 0;
-    height: 180px;
-    background: radial-gradient(ellipse at 50% 130%,
-                rgba(0, 200, 255, .35) 0%,
-                rgba(0, 140, 200, .12) 45%,
-                transparent 70%);
-    pointer-events: none;
-    z-index: 2;
-  }
+    .search-box input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-main);
+      font-size: 0.9rem;
+      padding: 6px 0;
+    }
 
-  @media (max-width: 420px) {
-    .logo-wrap { width: 135px; height: 135px; }
-    .play-btn  { padding: 16px 48px; }
-  }
-</style>
+    .search-box button {
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+      border: none;
+      color: #000;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .search-box button:active {
+      transform: scale(0.95);
+    }
+
+    /* Progress Indicator */
+    .progress-bar {
+      height: 2px;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+      transition: width 0.3s ease;
+    }
+
+    /* Main Viewport */
+    main {
+      flex: 1;
+      position: relative;
+      background: #000;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #fff;
+    }
+
+    /* Overlay Screen (Landing Page / Fallback State) */
+    .dashboard {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at top right, #1a1c2e, var(--bg-dark));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      text-align: center;
+      z-index: 10;
+      transition: opacity 0.4s ease;
+    }
+
+    .dashboard.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .hero-card {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-glow);
+      border-radius: 20px;
+      padding: 28px 20px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .hero-card h1 {
+      font-size: 1.8rem;
+      font-weight: 900;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+      background: linear-gradient(135deg, #ffffff, var(--accent-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-card p {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-bottom: 20px;
+    }
+
+    .tld-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    .chip {
+      background: rgba(0, 242, 254, 0.1);
+      border: 1px solid rgba(0, 242, 254, 0.2);
+      color: var(--accent-cyan);
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    /* Bottom Status Bar */
+    footer {
+      background: var(--panel-bg);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 6px 14px;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #00ff88;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+      box-shadow: 0 0 8px #00ff88;
+    }
+  </style>
 </head>
 <body>
 
-  <div id="bubbles"></div>
-
-  <div class="card">
-    <div class="logo-wrap">
-      <span class="fish-fallback">🐟</span>
-      <img src="icon.png" alt="TINNY FISH Logo">
+  <header>
+    <div class="brand-row">
+      <div class="brand-title">NEXURA BROWSER</div>
+      <div class="brand-author">CREATED BY MUHAMMAD TAQI</div>
     </div>
+    <div class="search-box">
+      <input type="text" id="urlInput" placeholder="Enter URL or search term (e.g. owner.taqi)..." autocomplete="off" spellcheck="false">
+      <button onclick="handleNavigation()">GO</button>
+    </div>
+  </header>
 
-    <h1 class="title">TINNY FISHING</h1>
-    <p class="credit">Created by <b>Muhammad Taqi</b></p>
+  <div class="progress-bar" id="progressBar"></div>
 
-    <button class="play-btn" onclick="startGame()">Play Game</button>
-  </div>
+  <main>
+    <div class="dashboard" id="dashboard">
+      <div class="hero-card">
+        <h1>NEXURA OS</h1>
+        <p>Custom TLD Resolver Engine active</p>
+        <div class="tld-chips" id="tldContainer">
+          <!-- Chips injected via JavaScript -->
+        </div>
+      </div>
+    </div>
+    <iframe id="browserFrame" src="about:blank"></iframe>
+  </main>
 
-  <div class="wave-glow"></div>
+  <footer>
+    <div><span class="status-dot"></span><span id="syncStatus">Syncing Database...</span></div>
+    <div>v1.0.0</div>
+  </footer>
 
-<script>
-  /* Bubbles */
-  (function makeBubbles() {
-    const box = document.getElementById('bubbles');
-    const total = window.innerWidth < 500 ? 12 : 20;
+  <script>
+    // Config: Dynamic JSON URL from external repository
+    const RAW_JSON_URL = 'https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_DATA_REPO/main/data.json';
 
-    for (let i = 0; i < total; i++) {
-      const b = document.createElement('span');
-      const size = Math.random() * 32 + 8;
-      b.style.width  = size + 'px';
-      b.style.height = size + 'px';
-      b.style.left   = Math.random() * 100 + '%';
-      b.style.animationDuration = (Math.random() * 9 + 6) + 's';
-      b.style.animationDelay    = (Math.random() * 10) + 's';
-      box.appendChild(b);
+    let customTlds = [];
+    let customDomains = {};
+
+    // Synchronize Database from external Repository
+    async function initDatabase() {
+      const syncStatus = document.getElementById('syncStatus');
+      try {
+        const response = await fetch(RAW_JSON_URL + '?t=' + new Date().getTime());
+        if (!response.ok) throw new Error('Network error');
+        const data = await response.json();
+        
+        customTlds = data.tlds || [];
+        customDomains = data.domains || {};
+
+        syncStatus.innerText = 'TLD Database Ready';
+        renderTldChips();
+      } catch (err) {
+        console.warn('Fallback local cache used or error fetching data:', err);
+        syncStatus.innerText = 'Offline Mode Active';
+        
+        // Fallback Defaults
+        customTlds = [".taqi", ".sigma", ".lyra", ".taha", ".zf", ".king", ".queen", ".lucas", ".eu", ".mm"];
+        customDomains = { "owner.taqi": "https://github.com" };
+        renderTldChips();
+      }
     }
-  })();
 
-  /* Play Game -> 1.html */
-  function startGame() {
-    window.location.href = '1.html';
-  }
-</script>
+    function renderTldChips() {
+      const container = document.getElementById('tldContainer');
+      container.innerHTML = customTlds.map(tld => `<span class="chip">${tld}</span>`).join('');
+    }
 
+    function handleNavigation() {
+      const input = document.getElementById('urlInput').value.trim();
+      const frame = document.getElementById('browserFrame');
+      const dashboard = document.getElementById('dashboard');
+      const progressBar = document.getElementById('progressBar');
+
+      if (!input) return;
+
+      progressBar.style.width = '30%';
+
+      const normalizedInput = input.toLowerCase();
+
+      // Check 1: Custom Exact Domain Match in JSON (e.g. owner.taqi)
+      if (customDomains[normalizedInput]) {
+        progressBar.style.width = '70%';
+        frame.src = customDomains[normalizedInput];
+        dashboard.classList.add('hidden');
+        progressBar.style.width = '100%';
+        setTimeout(() => { progressBar.style.width = '0%'; }, 300);
+        return;
+      }
+
+      // Check 2: Check if string ends with any defined TLD
+      const matchesCustomTLD = customTlds.some(tld => normalizedInput.endsWith(tld));
+
+      if (matchesCustomTLD) {
+        // TLD matched but no record exists in JSON -> Show search fallback
+        const query = encodeURIComponent(input);
+        frame.src = `https://www.google.com/search?q=${query}`;
+      } else if (normalizedInput.startsWith('http://') || normalizedInput.startsWith('https://')) {
+        // Direct Standard Web URL
+        frame.src = normalizedInput;
+      } else if (normalizedInput.includes('.') && !normalizedInput.includes(' ')) {
+        // Standard Web Domain (e.g., google.com)
+        frame.src = `https://${normalizedInput}`;
+      } else {
+        // Fallback Google Search for plain text queries
+        const query = encodeURIComponent(input);
+        frame.src = `https://www.google.com/search?q=${query}`;
+      }
+
+      dashboard.classList.add('hidden');
+      progressBar.style.width = '100%';
+      setTimeout(() => { progressBar.style.width = '0%'; }, 300);
+    }
+
+    // Enter key trigger
+    document.getElementById('urlInput').addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') handleNavigation();
+    });
+
+    // Initialize application
+    initDatabase();
+  </script>
 </body>
 </html>
